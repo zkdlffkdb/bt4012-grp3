@@ -1,0 +1,13 @@
+# Package versions recorded during the completed experiment.
+# Python 3.13.16
+numpy==2.1.3
+pandas==2.2.3
+scikit-learn==1.6.1
+imbalanced-learn==0.14.2
+xgboost==3.4.1
+joblib==1.6.0
+
+# Notebook and plotting tools; versions were not recorded in the run metadata.
+matplotlib
+ipython
+jupyterlab

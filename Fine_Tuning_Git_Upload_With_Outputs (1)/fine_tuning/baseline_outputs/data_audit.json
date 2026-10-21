@@ -1,0 +1,54 @@
+{
+  "splits": {
+    "train": {
+      "rows": 440018,
+      "columns": 488,
+      "fraud_count": 15405,
+      "fraud_rate": 0.03500993141189679,
+      "missing_labels": 0,
+      "duplicate_ids": 0,
+      "time_min": 86400.0,
+      "time_max": 11145595.0
+    },
+    "val": {
+      "rows": 61196,
+      "columns": 488,
+      "fraud_count": 2144,
+      "fraud_rate": 0.03503496960585659,
+      "missing_labels": 0,
+      "duplicate_ids": 0,
+      "time_min": 11145618.0,
+      "time_max": 13132788.0
+    },
+    "test": {
+      "rows": 89326,
+      "columns": 488,
+      "fraud_count": 3114,
+      "fraud_rate": 0.03486107068490697,
+      "missing_labels": 0,
+      "duplicate_ids": 0,
+      "time_min": 13132810.0,
+      "time_max": 15811131.0
+    }
+  },
+  "checks": {
+    "identical_column_order": true,
+    "disjoint_transaction_ids": true,
+    "strict_chronological_splits": true
+  },
+  "input_files": {
+    "train": {
+      "filename": "train.csv",
+      "sha256": "974a346c865f75383515a880516378aad68758a75154b476b8ee43cbf33e72e6"
+    },
+    "val": {
+      "filename": "val.csv",
+      "sha256": "bcbd7773bcf1e55490347941fa7966a4679ae9e1f26153dc887224a0d6b5d333"
+    },
+    "test": {
+      "filename": "test.csv",
+      "sha256": "2987fbe886f5b3aceb6281a96d1c555338863dc7018b63bbf254535c1dda340f"
+    }
+  },
+  "test_performance_evaluated": false
+}
