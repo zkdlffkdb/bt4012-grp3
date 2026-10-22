@@ -21,7 +21,16 @@ This repository contains the end-to-end data processing, feature engineering, ex
 - Cleaning & Categorical Encoding:Replaced infinite values (+inf, -inf) with NaN across training and validation sets.
 - Identified 37 categorical features (e.g., ProductCD, card4, card6, P_emaildomain, R_emaildomain, M1–M9, DeviceType, DeviceInfo, id_12–id_38) and encoded them via OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1).
 - Evaluation Metric: Primary optimization metric is Average Precision (PR-AUC / average_precision_score) to evaluate minority class retrieval under heavy imbalance.
-- Imbalance Scaling Factor: Calculated positive class weight (POS_WEIGHT) as 27.56 based on training class proportions.  
+- Imbalance Scaling Factor: Calculated positive class weight (POS_WEIGHT) as 27.56 based on training class proportions.
+
+## Fine Tuning
+The selected XGBoost model was tuned using three chronological cross-validation folds, with Average Precision (AP) as the selection metric. A decision threshold of approximately 0.3574 was then selected by maximizing validation F1.
+
+On the test set:
+- Hyperparameter tuning improved AP from **0.5942 to 0.6261** and F1 from **0.5826 to 0.6090** at the default 0.5 threshold.
+- Lowering the threshold increased recall from **52.83% to 58.48%**, detecting **176 additional fraud cases** but producing **584 additional false alarms**.
+- The selected threshold achieved test F1 of **0.5910**; its validation F1 improvement did not generalize to test.
+- See the README in `Fine_Tuning/` for the full methodology, evaluation limitations, results, and reproduction instructions.
 
 ## Folder Directory
 
@@ -39,5 +48,17 @@ bt4012-grp3/
 ├── .gitignore                      # Git ignore file for data files and heavy artifacts
 ├── .venv                           # virtual environment
 ├── requirements.txt                # Python environment dependencies
+├── Fine_Tuning/
+│   ├── Step_1_Baseline.ipynb
+│   ├── Step_2_Hyperparameter_Tuning.ipynb
+│   ├── Step_3_Threshold_Tuning.ipynb
+│   ├── Step_4_Final_Test_Evaluation.ipynb
+│   ├── baseline_outputs/                    # Intermediate artifacts
+│   ├── step_2_outputs/                      # Hyperparameter search results
+│   ├── step_3_outputs/                      # Threshold selection results
+│   ├── step_4_outputs/                      # Final model, metrics and plots
+│   ├── requirements-tuning.txt
+│   ├── .gitignore
+│   └── README.md                            # Detailed tuning documentation
 └── README.md                       # Project documentation and summary
 ```
