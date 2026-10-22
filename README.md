@@ -48,7 +48,7 @@ bt4012-grp3/
 ├── .gitignore                      # Git ignore file for data files and heavy artifacts
 ├── .venv                           # virtual environment
 ├── requirements.txt                # Python environment dependencies
-├── Fine_Tuning/
+├── Fine_Tuning/fine_tuning
 │   ├── Step_1_Baseline.ipynb
 │   ├── Step_2_Hyperparameter_Tuning.ipynb
 │   ├── Step_3_Threshold_Tuning.ipynb
