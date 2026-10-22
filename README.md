@@ -1,6 +1,6 @@
 # BT4012 Group 3: IEEE-CIS Fraud Detection
 ## Overview
-This repository contains the end-to-end data processing, feature engineering, exploratory data analysis, and machine learning benchmarking for the IEEE-CIS Fraud Detection project. The objective is to identify fraudulent e-commerce transactions while addressing severe class imbalance across high-dimensional tabular data.
+This repository contains the end-to-end data processing, feature engineering, exploratory data analysis, and machine learning benchmarking for the [IEEE-CIS Fraud Detection](https://www.kaggle.com/competitions/ieee-fraud-detection) project. The objective is to identify fraudulent e-commerce transactions while addressing severe class imbalance across high-dimensional tabular data.
 
 ## EDA
 - Data Sources: Merged transaction records (train_transaction.csv) and identity attributes (train_identity.csv) linked by TransactionID.
