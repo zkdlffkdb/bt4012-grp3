@@ -17,7 +17,7 @@ python -m pip install -r requirements-tuning.txt
 jupyter lab
 ```
 
-Place the original engineered `train.csv`, `val.csv` and `test.csv` files in `data/`, or directly beside the notebooks. The training alias `train (2).csv` and test alias `test (3).csv` are also accepted. Retain only one copy of each split. These datasets are excluded from the package and Git. The notebooks verify the original file hashes, so regenerating or re-exporting the CSVs may require a separate reproduction run.
+Place the original engineered `train.csv`, `val.csv` and `test.csv` files in `data/`, or directly beside the notebooks. Retain only one copy of each split. These datasets are excluded from the package and Git. The notebooks verify the original file hashes, so regenerating or re-exporting the CSVs may require a separate reproduction run.
 
 Each notebook defines `PROJECT_DIR = Path.cwd()`. Launch Jupyter from this directory, or set `PROJECT_DIR` to its absolute path. In Colab, use the commented Drive-mount configuration and set `PROJECT_DIR` to the directory containing these notebooks and output folders. `DATA_DIR` can be set independently when the CSVs are elsewhere.
 
