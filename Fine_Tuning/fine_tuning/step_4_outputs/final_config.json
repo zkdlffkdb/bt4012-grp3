@@ -1,7 +1,7 @@
 {
   "model": "XGBoost",
   "candidate_id": 15,
-  "threshold": 0.3574390113353729,
+  "threshold": 0.45939168334007263,
   "threshold_rule": ">",
   "threshold_objective": "f1",
   "training_sampling_ratio": 0.1,

@@ -1,0 +1,17 @@
+{
+  "candidate_id": 15,
+  "parameters": {
+    "subsample": 1.0,
+    "reg_lambda": 3.0,
+    "reg_alpha": 0.0,
+    "n_estimators": 400,
+    "min_child_weight": 3,
+    "max_depth": 6,
+    "learning_rate": 0.05,
+    "colsample_bytree": 0.85
+  },
+  "mean_cv_ap": 0.679165851949903,
+  "baseline_mean_cv_ap": 0.6538630432352259,
+  "mean_cv_ap_gain": 0.02530280871467705,
+  "selection_metric": "mean of three temporal-fold average precision scores"
+}

@@ -1,0 +1,7 @@
+,Baseline XGBoost,Tuned XGBoost
+CV chronological AP,0.6543 ± 0.0312,0.6749 ± 0.0199
+CV stratified_shuffled AP,0.7797 ± 0.0024,0.7654 ± 0.0028
+Validation split AP,0.7058,0.7066
+Test decision rule,Baseline @ 0.5,Final @ 0.4594
+Test AP [95% CI],"0.5942 [0.5757, 0.6120]","0.6263 [0.6089, 0.6422]"
+Test F1 at decision rule [95% CI],"0.5826 [0.5668, 0.5980]","0.6079 [0.5930, 0.6226]"

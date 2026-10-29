@@ -5,7 +5,7 @@
   "threshold": 0.5,
   "threshold_rule": "score > 0.5",
   "versions": {
-    "python": "3.13.16",
+    "python": "3.13.15",
     "numpy": "2.1.3",
     "pandas": "2.2.3",
     "scikit-learn": "1.6.1",
@@ -59,10 +59,10 @@
     "0": 154050,
     "1": 15405
   },
-  "training_seconds_including_sampling": 24.092337957999916,
+  "training_seconds_including_sampling": 2.1904937500075903,
   "validation_metrics": {
-    "Average precision": 0.7058307163138061,
-    "ROC AUC": 0.9472113015937889,
+    "Average precision": 0.7058308498914851,
+    "ROC AUC": 0.9472113055430024,
     "Precision": 0.7402898550724638,
     "Recall": 0.5956156716417911,
     "F1": 0.6601188937710003,

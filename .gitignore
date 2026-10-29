@@ -1,3 +1,25 @@
 /data
 /.venv
 /venv
+/.venv-tuning
+
+# Raw Kaggle files and engineered splits (large; regenerate with the notebooks)
+/train_transaction.csv
+/train_identity.csv
+/test_transaction.csv
+/test_identity.csv
+/sample_submission.csv
+/train.csv
+/val.csv
+/test.csv
+/split_assignments.csv
+
+# Symlinks to the root CSVs used by the Fine_Tuning notebooks
+/Fine_Tuning/fine_tuning/data/
+
+# Row-level prediction exports and scratch
+/Fine_Tuning/fine_tuning/step_*_outputs/*_predictions.csv
+/Fine_Tuning/fine_tuning/step_3_outputs/threshold_candidates.csv
+/evaluation_outputs/*_predictions.csv
+.DS_Store
+.ipynb_checkpoints/

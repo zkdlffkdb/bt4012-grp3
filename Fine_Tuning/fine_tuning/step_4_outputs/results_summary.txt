@@ -4,12 +4,12 @@ Model selection: XGBoost candidate 15, selected using mean average precision ove
 
 Selected hyperparameters: {"colsample_bytree": 0.85, "learning_rate": 0.05, "max_depth": 6, "min_child_weight": 3, "n_estimators": 400, "reg_alpha": 0.0, "reg_lambda": 3.0, "subsample": 1.0}
 
-Threshold selection: maximized validation F1 using score > 0.3574390113353729. Validation precision was 0.6813, recall 0.6511, F1 0.6659 and average precision 0.7094. These are threshold-selection results.
+Threshold selection: maximized validation F1 using score > 0.45939168334007263. Validation precision was 0.7543, recall 0.5998, F1 0.6682 and average precision 0.7066. These are threshold-selection results.
 
-Final test evaluation: 89,326 transactions, including 3,114 fraud cases. With the fixed model and threshold, precision was 0.5974, recall 0.5848, F1 0.5910, average precision 0.6261 and ROC AUC 0.9182.
+Final test evaluation: 89,326 transactions, including 3,114 fraud cases. With the fixed model and threshold, precision was 0.6878, recall 0.5446, F1 0.6079, average precision 0.6263 and ROC AUC 0.9182.
 
-The final system flagged 3,048 transactions, including 1,821 fraud cases and 1,227 false alarms. It missed 1,293 fraud cases.
+The final system flagged 2,466 transactions, including 1,696 fraud cases and 770 false alarms. It missed 1,418 fraud cases.
 
-Comparison on the same test split: the original baseline at 0.5 had F1 0.5826 and AP 0.5942; the hyperparameter-tuned model at 0.5 had F1 0.6090 and AP 0.6261. Threshold tuning leaves the tuned model's AP unchanged.
+Comparison on the same test split: the original baseline at 0.5 had F1 0.5826 and AP 0.5942; the hyperparameter-tuned model at 0.5 had F1 0.6085 and AP 0.6263. Threshold tuning leaves the tuned model's AP unchanged.
 
 The model and threshold were fixed before this test evaluation. No retraining, hyperparameter search or threshold optimization used the test outcomes. The original preprocessing chose split boundaries with knowledge of fraud rates across periods, including test; the reported results retain that evaluation limitation. The saved model bundle expects already-engineered features and does not include upstream raw-data feature engineering.

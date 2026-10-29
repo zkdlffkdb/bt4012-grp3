@@ -1,11 +1,11 @@
 {
   "evaluation_protocol": "fixed_model_fixed_threshold_v1",
-  "test_sha256": "2987fbe886f5b3aceb6281a96d1c555338863dc7018b63bbf254535c1dda340f",
-  "baseline_bundle_sha256": "4ed06cdd00f5d5e7a786f57f1014ece6fe13341eeb9b1a4ff7935be6f867f2f1",
-  "threshold_bundle_sha256": "d45bb43f13a19a807d33eb0c9bb850a13e1c9ab5f38802995bc712dcb5e6aa13",
-  "threshold_selection_sha256": "6e4f711c16ab649c24c8737f0db4058278b1fd0d55a3c79d0e9fbab177d3392d",
+  "test_sha256": "01ec7f6cb13f5d0d67356460935e24a3d38ece0980203566f1f4029b1ffc93c0",
+  "baseline_bundle_sha256": "ef6daecfc391eb69c6608975ef5474c47b9d30c5aa7eecfad716fcdb01f039f1",
+  "threshold_bundle_sha256": "369748c7eabe55179119370e3b2e410af263701a04eca5008c1a400f909f2d65",
+  "threshold_selection_sha256": "e09e5a41a8b8a13b890e94a9b2d5f628a77c0af39a61559704250d22595d494c",
   "candidate_id": 15,
-  "threshold": 0.3574390113353729,
+  "threshold": 0.45939168334007263,
   "threshold_rule": ">",
   "versions": {
     "numpy": "2.1.3",

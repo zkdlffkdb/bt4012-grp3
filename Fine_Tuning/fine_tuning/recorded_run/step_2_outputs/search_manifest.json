@@ -1,0 +1,252 @@
+{
+  "implementation": "step2_temporal_v1",
+  "train_sha256": "974a346c865f75383515a880516378aad68758a75154b476b8ee43cbf33e72e6",
+  "baseline_bundle_sha256": "4ed06cdd00f5d5e7a786f57f1014ece6fe13341eeb9b1a4ff7935be6f867f2f1",
+  "versions": {
+    "numpy": "2.1.3",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.6.1",
+    "imbalanced-learn": "0.14.2",
+    "xgboost": "3.4.1",
+    "joblib": "1.6.0"
+  },
+  "seed": 42,
+  "gap_days": 7,
+  "label_delay_days": 7,
+  "sampling_ratio": 0.1,
+  "candidates": [
+    {},
+    {
+      "subsample": 1.0,
+      "reg_lambda": 1.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 100,
+      "min_child_weight": 10,
+      "max_depth": 8,
+      "learning_rate": 0.03,
+      "colsample_bytree": 1.0
+    },
+    {
+      "subsample": 0.7,
+      "reg_lambda": 1.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 200,
+      "min_child_weight": 5,
+      "max_depth": 4,
+      "learning_rate": 0.1,
+      "colsample_bytree": 0.85
+    },
+    {
+      "subsample": 1.0,
+      "reg_lambda": 3.0,
+      "reg_alpha": 1.0,
+      "n_estimators": 700,
+      "min_child_weight": 10,
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "colsample_bytree": 0.7
+    },
+    {
+      "subsample": 1.0,
+      "reg_lambda": 10.0,
+      "reg_alpha": 0.1,
+      "n_estimators": 700,
+      "min_child_weight": 3,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "colsample_bytree": 0.7
+    },
+    {
+      "subsample": 0.7,
+      "reg_lambda": 3.0,
+      "reg_alpha": 1.0,
+      "n_estimators": 700,
+      "min_child_weight": 10,
+      "max_depth": 6,
+      "learning_rate": 0.2,
+      "colsample_bytree": 1.0
+    },
+    {
+      "subsample": 1.0,
+      "reg_lambda": 1.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 700,
+      "min_child_weight": 10,
+      "max_depth": 8,
+      "learning_rate": 0.3,
+      "colsample_bytree": 0.85
+    },
+    {
+      "subsample": 0.7,
+      "reg_lambda": 3.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 700,
+      "min_child_weight": 5,
+      "max_depth": 5,
+      "learning_rate": 0.03,
+      "colsample_bytree": 0.85
+    },
+    {
+      "subsample": 0.85,
+      "reg_lambda": 10.0,
+      "reg_alpha": 1.0,
+      "n_estimators": 200,
+      "min_child_weight": 1,
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "colsample_bytree": 0.85
+    },
+    {
+      "subsample": 1.0,
+      "reg_lambda": 3.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 700,
+      "min_child_weight": 1,
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "colsample_bytree": 1.0
+    },
+    {
+      "subsample": 0.85,
+      "reg_lambda": 1.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 100,
+      "min_child_weight": 5,
+      "max_depth": 8,
+      "learning_rate": 0.1,
+      "colsample_bytree": 0.7
+    },
+    {
+      "subsample": 1.0,
+      "reg_lambda": 1.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 100,
+      "min_child_weight": 1,
+      "max_depth": 8,
+      "learning_rate": 0.1,
+      "colsample_bytree": 0.85
+    },
+    {
+      "subsample": 0.7,
+      "reg_lambda": 3.0,
+      "reg_alpha": 1.0,
+      "n_estimators": 700,
+      "min_child_weight": 1,
+      "max_depth": 8,
+      "learning_rate": 0.2,
+      "colsample_bytree": 1.0
+    },
+    {
+      "subsample": 0.85,
+      "reg_lambda": 10.0,
+      "reg_alpha": 1.0,
+      "n_estimators": 700,
+      "min_child_weight": 1,
+      "max_depth": 3,
+      "learning_rate": 0.1,
+      "colsample_bytree": 0.7
+    },
+    {
+      "subsample": 1.0,
+      "reg_lambda": 1.0,
+      "reg_alpha": 0.1,
+      "n_estimators": 200,
+      "min_child_weight": 10,
+      "max_depth": 3,
+      "learning_rate": 0.03,
+      "colsample_bytree": 1.0
+    },
+    {
+      "subsample": 1.0,
+      "reg_lambda": 3.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 400,
+      "min_child_weight": 3,
+      "max_depth": 6,
+      "learning_rate": 0.05,
+      "colsample_bytree": 0.85
+    },
+    {
+      "subsample": 0.7,
+      "reg_lambda": 3.0,
+      "reg_alpha": 1.0,
+      "n_estimators": 200,
+      "min_child_weight": 10,
+      "max_depth": 8,
+      "learning_rate": 0.1,
+      "colsample_bytree": 1.0
+    },
+    {
+      "subsample": 1.0,
+      "reg_lambda": 3.0,
+      "reg_alpha": 1.0,
+      "n_estimators": 100,
+      "min_child_weight": 3,
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "colsample_bytree": 0.85
+    },
+    {
+      "subsample": 0.7,
+      "reg_lambda": 1.0,
+      "reg_alpha": 0.1,
+      "n_estimators": 400,
+      "min_child_weight": 5,
+      "max_depth": 6,
+      "learning_rate": 0.1,
+      "colsample_bytree": 1.0
+    },
+    {
+      "subsample": 0.7,
+      "reg_lambda": 3.0,
+      "reg_alpha": 0.1,
+      "n_estimators": 200,
+      "min_child_weight": 1,
+      "max_depth": 5,
+      "learning_rate": 0.1,
+      "colsample_bytree": 0.85
+    },
+    {
+      "subsample": 0.7,
+      "reg_lambda": 10.0,
+      "reg_alpha": 0.0,
+      "n_estimators": 100,
+      "min_child_weight": 3,
+      "max_depth": 8,
+      "learning_rate": 0.2,
+      "colsample_bytree": 0.7
+    }
+  ],
+  "folds": [
+    {
+      "fold": 1,
+      "fit_rows": 233881,
+      "score_rows": 56159,
+      "fit_end_seconds": 5529566,
+      "score_start_seconds": 6134400,
+      "score_end_seconds_exclusive": 7776000,
+      "fit_fraud_rate": 0.03171698427832958,
+      "score_fraud_rate": 0.038390996990687154
+    },
+    {
+      "fold": 2,
+      "fit_rows": 291259,
+      "score_rows": 64375,
+      "fit_end_seconds": 7171185,
+      "score_start_seconds": 7776000,
+      "score_end_seconds_exclusive": 9417600,
+      "fit_fraud_rate": 0.03355432793493077,
+      "score_fraud_rate": 0.03555728155339806
+    },
+    {
+      "fold": 3,
+      "fit_rows": 356216,
+      "score_rows": 63069,
+      "fit_end_seconds": 8812779,
+      "score_start_seconds": 9417600,
+      "score_end_seconds_exclusive": 11145600,
+      "fit_fraud_rate": 0.03379690974015766,
+      "score_fraud_rate": 0.040368485309740125
+    }
+  ]
+}

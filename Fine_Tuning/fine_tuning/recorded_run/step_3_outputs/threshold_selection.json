@@ -1,0 +1,29 @@
+{
+  "objective": "f1",
+  "minimum_precision": null,
+  "threshold": 0.3574390113353729,
+  "threshold_rule": ">",
+  "tie_break": "objective descending, false positives ascending, threshold descending",
+  "validation_metrics": {
+    "threshold": 0.3574390113353729,
+    "precision": 0.6813079551000488,
+    "recall": 0.6511194029850746,
+    "f1": 0.6658716909134271,
+    "f2": 0.6569411764705883,
+    "false_positive_rate": 0.011058050531734743,
+    "tp": 1396.0,
+    "fp": 653.0,
+    "fn": 748.0,
+    "tn": 58399.0,
+    "alerts": 2049.0,
+    "alert_rate": 0.03348258056082097
+  },
+  "average_precision": 0.7094029746428107,
+  "roc_auc": 0.9513646301868023,
+  "candidate_id": 15,
+  "source_model_sha256": "8c0165cc3af762b77b01ac02903e477469e443b7fc9a3e4187cb9243f490fd14",
+  "source_scores_sha256": "7b28d1269f1007dbda5d71fb6b8f2dbfe5a6dde43055b07217080ef162f0377c",
+  "source_validation_sha256": "bcbd7773bcf1e55490347941fa7966a4679ae9e1f26153dc887224a0d6b5d333",
+  "threshold_chosen_on_validation": true,
+  "test_performance_evaluated": false
+}

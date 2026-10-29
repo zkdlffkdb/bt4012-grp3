@@ -10,8 +10,8 @@
     "learning_rate": 0.05,
     "colsample_bytree": 0.85
   },
-  "mean_cv_ap": 0.679165851949903,
+  "mean_cv_ap": 0.6795515743288449,
   "baseline_mean_cv_ap": 0.6538630432352259,
-  "mean_cv_ap_gain": 0.02530280871467705,
+  "mean_cv_ap_gain": 0.025688531093619016,
   "selection_metric": "mean of three temporal-fold average precision scores"
 }
