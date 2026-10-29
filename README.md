@@ -33,34 +33,33 @@ On the test set:
 - See the README in `Fine_Tuning/` for the full methodology, evaluation limitations, results, and reproduction instructions.
 
 ## Evaluation and Validation (k-fold)
-The notebooks above judge every model on one split of the data (train → validation → test). One split gives one number per metric. It cannot tell us how much that number would change if we scored a different month. `Evaluation.ipynb` adds k-fold cross-validation on top of the pipeline to answer three questions:
+The sections above judge each model on a single split (train → validation → test). That gives one number per metric and no sense of how much it would change for a different month. `Evaluation.ipynb` repeats the comparison across several time periods and adds confidence intervals to the test results.
 
-| Question | What the notebook does |
-| --- | --- |
-| How well does the model do on weeks it has never seen, and how much does that vary? | **Chronological 5-fold CV** on the development data (train + validation, Dec 2017 – Apr 2018). The first 40% of days are only used for training. The remaining days are cut into five blocks of about 18 days. Each fold trains on all rows at least 7 days before its block, then scores the block. This is how a fraud model is used in practice, so this is the estimate we trust. |
-| How much would a classic shuffled k-fold overstate performance? | **Shuffled `StratifiedKFold` (5 folds)** on the same rows, reported for comparison only. In a shuffled split, rows from the future end up in the training folds. |
-| How certain are the test numbers? | **Bootstrap (1,000 resamples) of the test split** with the fixed final model: 95% confidence intervals for every metric and for the differences between configurations. |
+What the notebook does:
+- Compares the **baseline XGBoost** (library defaults, as in `Modelling.ipynb`) with the **tuned XGBoost** (Fine_Tuning candidate 15). Both use random undersampling (fraud : non-fraud = 1 : 10).
+- **Chronological 5-fold CV** on train + validation (Dec 2017 – Apr 2018): each fold trains on earlier weeks, skips 7 days, and scores the next block of about 18 days. This mirrors real use (train on the past, score the future), so it is the estimate we trust.
+- **Shuffled 5-fold CV** (`StratifiedKFold`) on the same rows, for comparison only. It shows how much a classic k-fold overstates performance when future rows end up in training.
+- **Bootstrap of the test split** (1,000 resamples) with the fixed final model: 95% confidence intervals for every metric and for the differences between models.
+- Inside every fold, the frequency encodings, the label-history features (`prev_uid_*`, 7-day label delay) and the category codes are rebuilt from that fold's training rows only, so nothing leaks from the future. The test split is never used in cross-validation.
 
-Two models are compared, both trained with random undersampling (fraud : non-fraud = 1 : 10): the **baseline XGBoost** (library defaults, as in `Modelling.ipynb`) and the **tuned XGBoost** (Fine_Tuning candidate 15). To avoid leakage, every fold rebuilds the 18 frequency encodings, the two label-history columns (`prev_uid_fraud_count`, `prev_uid_has_fraud`, with the 7-day label delay) and the category codes from its training rows only. The test split is never used in cross-validation.
+Results (Average Precision):
 
-The notebook reads the tuned hyperparameters and the decision threshold from the Fine_Tuning output folders. Those folders now hold a full re-run of the Fine_Tuning notebooks made on 2026-10-23 (candidate 15 was selected again; the F1-best validation threshold came out as 0.4594 instead of 0.3574). The original run is kept unchanged in `Fine_Tuning/fine_tuning/recorded_run/`, and `Fine_Tuning/fine_tuning/README.md` compares the two runs.
-
-Key results:
-
-| Estimate | Baseline XGBoost AP | Tuned XGBoost AP |
+| Estimate | Baseline XGBoost | Tuned XGBoost |
 | --- | ---: | ---: |
-| Chronological 5-fold CV (mean ± sd) | 0.654 ± 0.031 | **0.675 ± 0.020** — tuned better in 5 of 5 folds |
-| Shuffled 5-fold CV (mean ± sd) | 0.780 ± 0.002 | 0.765 ± 0.003 — ranking reversed |
+| Chronological 5-fold CV (mean ± sd) | 0.654 ± 0.031 | **0.675 ± 0.020** (better in 5 of 5 folds) |
+| Shuffled 5-fold CV (mean ± sd) | 0.780 ± 0.002 | 0.765 ± 0.003 (ranking reversed) |
 | Single validation split | 0.706 | 0.707 |
-| Test split, 95% bootstrap interval | 0.594 [0.576, 0.612] | **0.626 [0.609, 0.642]** |
+| Test split (95% bootstrap interval) | 0.594 [0.576, 0.612] | **0.626 [0.609, 0.642]** |
 
-What this tells us:
-- **Tuning helps, and the gain holds over time.** The tuned model wins every chronological fold (+0.021 AP on average). On the test split the gain is clearly larger than sampling noise: AP +0.032 (95% CI +0.026 to +0.039) and F1 at 0.5 +0.026 (CI +0.017 to +0.035).
-- **Shuffled k-fold is the wrong tool for this data.** It overstates AP by about 0.09 and ranks the two models the wrong way round (the default baseline wins all five shuffled folds), because future rows and repeat cards leak into training. Only the chronological estimate should be used for decisions.
-- **Performance depends on the period.** Tuned-model AP ranges from 0.647 to 0.697 across the five scoring blocks, and the May test split (0.626) is harder than any development block. A fair summary is "AP ≈ 0.67 ± 0.02 on unseen future weeks, 0.63 on the May test month".
-- **The F1-best threshold is unstable.** It lands anywhere between 0.39 and 0.58 depending on the fold. On the test split the validation-chosen threshold changes F1 by only −0.0006 (CI −0.005 to +0.004) compared with 0.5; it trades precision for recall. The working threshold should be set from review capacity or from the cost of a missed fraud versus a false alarm, not from one month's F1 peak.
+Key takeaways:
+- **Tuning helps, and the gain holds over time.** The tuned model wins every chronological fold (**+0.021** AP on average), and on the test split the gain is clearly larger than sampling noise (AP **+0.032**, 95% CI +0.026 to +0.039).
+- **Shuffled k-fold is misleading here.** It overstates AP by about **0.09** and even ranks the two models the wrong way round, because future rows and repeat cards leak into training. Only the chronological estimate should guide decisions.
+- **Results vary by period.** Tuned-model AP ranges from **0.647 to 0.697** across the five scoring blocks, and the May test split (**0.626**) is harder than any of them. A fair summary: about 0.67 ± 0.02 on unseen future weeks, 0.63 on the test month.
+- **The F1-best threshold is unstable.** It lands anywhere between **0.39 and 0.58** depending on the fold, and on the test split the chosen threshold changes F1 by only −0.0006 compared with 0.5. The operating threshold should come from review capacity or the cost of a missed fraud versus a false alarm, not from one month's F1 peak.
 
-All tables and plots are written to `evaluation_outputs/` (`cv_fold_results.csv`, `cv_summary.csv`, `cv_paired_comparison.csv`, `test_bootstrap_ci.csv`, `test_bootstrap_differences.csv`, `consolidated_summary.csv`, three PNG figures and `evaluation_run.json` with the settings, package versions and data checksums of the run). The settings are constants at the top of the notebook (`N_FOLDS = 5`, `FIRST_SCORE_FRAC = 0.40`, `GAP_DAYS = 7`, `LABEL_DELAY_DAYS = 7`, `SAMPLING_RATIO = 0.1`, `N_BOOTSTRAP = 1000`, `SEED = 42`). The whole notebook runs in about 2 minutes on an Apple M4 Pro.
+Notes:
+- The notebook reads the tuned hyperparameters and threshold from the Fine_Tuning output folders. Those folders now hold a full re-run made on 2026-10-23 (candidate 15 again; F1-best validation threshold **0.4594** instead of 0.3574). The original run is archived unchanged in `Fine_Tuning/fine_tuning/recorded_run/`, and `Fine_Tuning/fine_tuning/README.md` compares the two.
+- All tables and plots are saved in `evaluation_outputs/`. The settings (`N_FOLDS`, `GAP_DAYS`, `N_BOOTSTRAP`, …) are constants at the top of the notebook, and the whole notebook runs in about 2 minutes.
 
 ## How to Run the Notebooks End to End
 
@@ -108,7 +107,8 @@ write_result(PATHS['val'], 'val_result.csv')          # another engineered CSV
 write_result(PATHS['test'], 'result.csv', threshold=0.5)
 ```
 
-The model, encoder, feature order and threshold are read from `Fine_Tuning/fine_tuning/step_4_outputs/final_model_bundle.joblib`, and the input is read in chunks, so large files work too. No separate script is needed; everything runs inside the notebook.
+The model, encoder, feature order and threshold are read from `Fine_Tuning/fine_tuning/step_4_outputs/final_model_bundle.joblib`, and the input is read in chunks, so large files work too. 
+
 
 ## Folder Directory
 
