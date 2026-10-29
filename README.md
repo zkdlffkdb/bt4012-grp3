@@ -110,18 +110,6 @@ write_result(PATHS['test'], 'result.csv', threshold=0.5)
 
 The model, encoder, feature order and threshold are read from `Fine_Tuning/fine_tuning/step_4_outputs/final_model_bundle.joblib`, and the input is read in chunks, so large files work too. No separate script is needed; everything runs inside the notebook.
 
-**Notes**
-- **Only want `Evaluation.ipynb`?** It needs the three split CSVs (notebook 1) and the Fine_Tuning output folders. Those folders are in git, so after notebook 1 you can run `Evaluation.ipynb` straight away.
-- **Fine_Tuning data folder.** The Fine_Tuning notebooks look for the CSVs in a `data/` folder next to them. That folder holds git-ignored symlinks to the root CSVs. Recreate them if they are missing:
-  ```bash
-  mkdir -p Fine_Tuning/fine_tuning/data
-  ln -sf ../../../train.csv Fine_Tuning/fine_tuning/data/train.csv
-  ln -sf ../../../val.csv   Fine_Tuning/fine_tuning/data/val.csv
-  ln -sf ../../../test.csv  Fine_Tuning/fine_tuning/data/test.csv
-  ```
-- **Re-running the Fine_Tuning steps.** Steps 2–4 refuse to write into output folders that came from different inputs. Move `baseline_outputs/`, `step_2_outputs/`, `step_3_outputs/` and `step_4_outputs/` out of the way (for example into a `previous_run/` folder) before starting a fresh Step 1.
-- **Different machine, slightly different numbers.** XGBoost results can differ in the third decimal between CPU types. The conclusions do not change, but the F1-best threshold chosen in Step 3 can move noticeably, because validation F1 is flat around its peak.
-
 ## Folder Directory
 
 ```plaintext
