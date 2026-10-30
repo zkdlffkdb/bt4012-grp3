@@ -24,13 +24,58 @@ This repository contains the end-to-end data processing, feature engineering, ex
 - Imbalance Scaling Factor: Calculated positive class weight (POS_WEIGHT) as 27.56 based on training class proportions for the weighted-loss experiments. The selected model instead uses random undersampling ratio 0.1 and scale_pos_weight=1.
 
 ## Fine Tuning
-The current completed rerun is the reference used by `Evaluation.ipynb` and the final prediction file. XGBoost hyperparameters were selected by mean AP across three chronological training folds; candidate 15 achieved mean AP **0.679552**, compared with **0.653863** for the untuned XGBoost with RUS. Maximum validation F1 selected threshold **0.45939168334007263** using `score > threshold`.
 
-On test, hyperparameter tuning improved AP from **0.594245 to 0.626285** and F1 at 0.5 from **0.582580 to 0.608486**. The selected threshold increased recall from **52.73% to 54.46%**, catching **54 additional fraud cases** and producing **129 additional false alarms**. Final precision was **68.78%** and F1 was **0.607885**; the validation F1 benefit did not generalize to test.
+XGBoost hyperparameters were selected using three chronological training
+folds, with mean Average Precision (AP) as the selection metric. Twenty
+sampled configurations were compared with the baseline. Candidate 15
+achieved mean AP **0.679552**, compared with **0.653863** for the untuned
+XGBoost with random undersampling.
 
-`Modelling.ipynb` selects the model and sampling strategy; Step 1 verifies and exports that same untuned XGBoost with RUS, with matching displayed validation AP **0.705831**. Step 2 and Evaluation load the Step 1 bundle, not the legacy standalone file in `saved_models/`.
+The selected model uses 400 trees, a learning rate of 0.05 and maximum
+depth of 6. Random undersampling remained at a minority-to-majority ratio
+of 0.1. A threshold of **0.459392** was selected by maximising validation
+F1, using the decision rule `score > threshold`.
 
-The original experiment (threshold 0.357439) is archived under `Fine_Tuning/fine_tuning/recorded_run/`. Its metrics are historical and must not be mixed with the current run. See [the tuning README](Fine_Tuning/fine_tuning/README.md) for full results and limitations.
+### Step 1 Baseline Rerun
+
+Step 1 refits the untuned XGBoost with random undersampling selected in
+`Modelling.ipynb`. It verifies the baseline and exports the fitted model,
+categorical encoder and feature order for subsequent steps; it is not
+a separate model-selection experiment.
+
+The current modelling output and Step 1 agree at the displayed precision:
+validation AP **0.705831**, with **1,277 true positives** and **448 false
+positives**. The comparison against AP **0.701045** refers to an older
+historical result, so its mismatch flags do not indicate a failure to
+reproduce the current baseline.
+
+### Test Results
+
+| Configuration | AP | Precision | Recall | F1 |
+| --- | ---: | ---: | ---: | ---: |
+| Untuned XGBoost with RUS at 0.5 | 0.594245 | 66.61% | 51.77% | 0.582580 |
+| Tuned XGBoost at 0.5 | 0.626285 | 71.92% | 52.73% | 0.608486 |
+| Tuned XGBoost at selected threshold | 0.626285 | 68.78% | 54.46% | 0.607885 |
+
+Hyperparameter tuning improved test AP and F1 at the same 0.5 threshold.
+Lowering the threshold detected **54 additional fraud cases** but produced
+**129 additional false alarms** compared with the tuned model at 0.5.
+The threshold's validation F1 improvement did not generalise to test.
+
+### Run Reference and Reproduction
+
+The results above describe the current rerun used by `Evaluation.ipynb`
+and the final prediction file. The original experiment, which selected
+threshold **0.357439**, is archived under
+`Fine_Tuning/fine_tuning/recorded_run/` and should be treated separately.
+
+Saved outputs can be reviewed without retraining. For a fresh
+reproduction, set `BT4012_TUNING_RUN` to a new name before running
+Steps 1–4. Evaluation uses the same named run, preserving the committed
+artifacts.
+
+See [the tuning README](Fine_Tuning/fine_tuning/README.md) for complete
+settings, saved artifacts, reproduction instructions and limitations.
 
 ## Evaluation and Validation (k-fold)
 The sections above judge each model on a single split (train → validation → test). That gives one number per metric and no sense of how much it would change for a different month. `Evaluation.ipynb` repeats the comparison across several time periods and adds confidence intervals to the test results.
