@@ -10,7 +10,7 @@ This repository contains the end-to-end data processing, feature engineering, ex
 - Target Class Imbalance: Demonstrates extreme target skewness with 569,877 non-fraudulent cases (97%) and 20,663 fraudulent cases (3%).
 - Data Quality: Contains 0 duplicate rows across all 590,540 records (0.00% duplicates).
 - Temporal Range: TransactionDT values span from 86,400 to 15,811,131 seconds.
-- Missing Value Profile: Features display significant missingness, with specific identity attributes (id_24, id_25, id_07, id_08, id_21, id_26) exceeding 99% missing values.   
+- Missing Value Profile: Features display significant missingness, with specific identity attributes (id_24, id_25, id_07, id_08, id_21, id_26) exceeding 99% missing values.
 
 ## Preprocessing & Modeling Pipeline
 - Dataset Splits:
@@ -18,19 +18,19 @@ This repository contains the end-to-end data processing, feature engineering, ex
   - Validation Set: 61,196 samples, 488 columns.
   - Test Set: 89,326 samples, 488 columns.
 - Excluded Features: Non-predictive metadata fields excluded prior to modeling include LABEL (isFraud), TransactionID, TransactionDT, TransactionDateTime, Transaction_Day, and uid.
-- Cleaning & Categorical Encoding:Replaced infinite values (+inf, -inf) with NaN across training and validation sets.
+- Cleaning & Categorical Encoding: Replaced infinite values (+inf, -inf) with NaN across training and validation sets.
 - Identified 37 categorical features (e.g., ProductCD, card4, card6, P_emaildomain, R_emaildomain, M1–M9, DeviceType, DeviceInfo, id_12–id_38) and encoded them via OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1).
-- Evaluation Metric: Primary optimization metric is Average Precision (PR-AUC / average_precision_score) to evaluate minority class retrieval under heavy imbalance.
-- Imbalance Scaling Factor: Calculated positive class weight (POS_WEIGHT) as 27.56 based on training class proportions.
+- Evaluation Metric: Primary optimization metric is Average Precision (AP, computed with average_precision_score) to evaluate minority class retrieval under heavy imbalance.
+- Imbalance Scaling Factor: Calculated positive class weight (POS_WEIGHT) as 27.56 based on training class proportions for the weighted-loss experiments. The selected model instead uses random undersampling ratio 0.1 and scale_pos_weight=1.
 
 ## Fine Tuning
-The selected XGBoost model was tuned using three chronological cross-validation folds, with Average Precision (AP) as the selection metric. A decision threshold of approximately 0.3574 was then selected by maximizing validation F1.
+The current completed rerun is the reference used by `Evaluation.ipynb` and the final prediction file. XGBoost hyperparameters were selected by mean AP across three chronological training folds; candidate 15 achieved mean AP **0.679552**, compared with **0.653863** for the untuned XGBoost with RUS. Maximum validation F1 selected threshold **0.45939168334007263** using `score > threshold`.
 
-On the test set:
-- Hyperparameter tuning improved AP from **0.5942 to 0.6261** and F1 from **0.5826 to 0.6090** at the default 0.5 threshold.
-- Lowering the threshold increased recall from **52.83% to 58.48%**, detecting **176 additional fraud cases** but producing **584 additional false alarms**.
-- The selected threshold achieved test F1 of **0.5910**; its validation F1 improvement did not generalize to test.
-- See the README in `Fine_Tuning/` for the full methodology, evaluation limitations, results, and reproduction instructions.
+On test, hyperparameter tuning improved AP from **0.594245 to 0.626285** and F1 at 0.5 from **0.582580 to 0.608486**. The selected threshold increased recall from **52.73% to 54.46%**, catching **54 additional fraud cases** and producing **129 additional false alarms**. Final precision was **68.78%** and F1 was **0.607885**; the validation F1 benefit did not generalize to test.
+
+`Modelling.ipynb` selects the model and sampling strategy; Step 1 verifies and exports that same untuned XGBoost with RUS, with matching displayed validation AP **0.705831**. Step 2 and Evaluation load the Step 1 bundle, not the legacy standalone file in `saved_models/`.
+
+The original experiment (threshold 0.357439) is archived under `Fine_Tuning/fine_tuning/recorded_run/`. Its metrics are historical and must not be mixed with the current run. See [the tuning README](Fine_Tuning/fine_tuning/README.md) for full results and limitations.
 
 ## Evaluation and Validation (k-fold)
 The sections above judge each model on a single split (train → validation → test). That gives one number per metric and no sense of how much it would change for a different month. `Evaluation.ipynb` repeats the comparison across several time periods and adds confidence intervals to the test results.
@@ -52,7 +52,7 @@ Results (Average Precision):
 | Test split (95% bootstrap interval) | 0.594 [0.576, 0.612] | **0.626 [0.609, 0.642]** |
 
 Key takeaways:
-- **Tuning helps, and the gain holds over time.** The tuned model wins every chronological fold (**+0.021** AP on average), and on the test split the gain is clearly larger than sampling noise (AP **+0.032**, 95% CI +0.026 to +0.039).
+- **Tuning helps, and the gain holds over time.** The tuned model wins every chronological fold (**+0.021** AP on average), and on the test split the gain is clearly larger than sampling noise (AP **+0.032**, 95% CI +0.0255 to +0.0385).
 - **Shuffled k-fold is misleading here.** It overstates AP by about **0.09** and even ranks the two models the wrong way round, because future rows and repeat cards leak into training. Only the chronological estimate should guide decisions.
 - **Results vary by period.** Tuned-model AP ranges from **0.647 to 0.697** across the five scoring blocks, and the May test split (**0.626**) is harder than any of them. A fair summary: about 0.67 ± 0.02 on unseen future weeks, 0.63 on the test month.
 - **The F1-best threshold is unstable.** It lands anywhere between **0.39 and 0.58** depending on the fold, and on the test split the chosen threshold changes F1 by only −0.0006 compared with 0.5. The operating threshold should come from review capacity or the cost of a missed fraud versus a false alarm, not from one month's F1 peak.
@@ -63,7 +63,7 @@ Notes:
 
 ## How to Run the Notebooks End to End
 
-**Step 1 – Get the data.** Download `train_transaction.csv` and `train_identity.csv` from the [Kaggle competition page](https://www.kaggle.com/competitions/ieee-fraud-detection/data) and put them in the repository root. All CSV files are git-ignored, so they are never committed.
+**Step 1 – Get the data.** Download `train_transaction.csv` and `train_identity.csv` from the [Kaggle competition page](https://www.kaggle.com/competitions/ieee-fraud-detection/data) and put them in the repository root. Raw datasets and engineered splits are git-ignored. Aggregate result CSVs and the committed prediction export are retained.
 
 **Step 2 – Create the Python environment.** The Fine_Tuning notebooks were recorded with pinned package versions, so the whole pipeline runs in one environment built from those pins (Python 3.13). From the repository root:
 
@@ -75,16 +75,16 @@ python3.13 -m venv .venv-tuning
 
 The core pins are the ones listed in `Fine_Tuning/fine_tuning/requirements-tuning.txt`. On macOS, LightGBM and XGBoost also need the OpenMP runtime: `brew install libomp`.
 
-**Step 3 – Run the notebooks in this order.** Every notebook runs top to bottom without edits.
+**Step 3 – Choose saved-result review or a fresh reproduction.** Saved notebook outputs and artifacts can be reviewed without running training. For a new run, use a unique output name as explained below; do not execute Step 1 over an existing downstream run.
 
 | Order | Notebook | Needs | Writes | Time (Apple M4 Pro) |
 | --- | --- | --- | --- | --- |
 | 1 | `Data_Transformation_Feature_Engineering.ipynb` | the two raw Kaggle files | `train.csv`, `val.csv`, `test.csv`, `split_assignments.csv`, `split_summary.csv` | ~4 min |
 | 2 | `Modelling.ipynb` | the three split CSVs | comparison tables inside the notebook | ~2 min |
-| 3 | `Fine_Tuning/fine_tuning/Step_1_Baseline.ipynb`, then `Step_2_Hyperparameter_Tuning.ipynb`, `Step_3_Threshold_Tuning.ipynb`, `Step_4_Final_Test_Evaluation.ipynb` | the three split CSVs, reached through `Fine_Tuning/fine_tuning/data/` (see the notes below) | `baseline_outputs/`, `step_2_outputs/`, `step_3_outputs/`, `step_4_outputs/` | ~5 min |
+| 3 | `Fine_Tuning/fine_tuning/Step_1_Baseline.ipynb`, then `Step_2_Hyperparameter_Tuning.ipynb`, `Step_3_Threshold_Tuning.ipynb`, `Step_4_Final_Test_Evaluation.ipynb` | the three split CSVs in the repository root or root `data/` (no symlinks required) | `baseline_outputs/`, `step_2_outputs/`, `step_3_outputs/`, `step_4_outputs/` | ~5 min |
 | 4 | `Evaluation.ipynb` | the three split CSVs and the Fine_Tuning output folders | `evaluation_outputs/` | ~2 min |
 
-*To run a notebook interactively:* open it in VS Code, Antigravity or JupyterLab, pick the `.venv-tuning` interpreter as the kernel, and choose *Run All*. Notebooks 1, 2 and 4 must be opened from the repository root; the four Fine_Tuning notebooks from `Fine_Tuning/fine_tuning/` (this is the default when you open the file where it sits).
+*To run a notebook interactively:* open it in VS Code, Antigravity or JupyterLab, pick the `.venv-tuning` interpreter as the kernel, and choose *Run All*. Run feature engineering and initial modelling from the repository root. Tuning and Evaluation resolve the repository automatically from the working directory or its parents. The three engineered CSVs can be in the repository root or root `data/`; root files take precedence. No local symlinks are required.
 
 *To run everything from the terminal* (each command executes one notebook in place and saves its outputs; run from the repository root):
 
@@ -92,11 +92,15 @@ The core pins are the ones listed in `Fine_Tuning/fine_tuning/requirements-tunin
 NB=.venv-tuning/bin/jupyter
 $NB nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Data_Transformation_Feature_Engineering.ipynb
 $NB nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Modelling.ipynb
+# Set a NEW name for each complete reproduction; keep it set through Evaluation.
+export BT4012_TUNING_RUN=reproduction_01
 for step in Step_1_Baseline Step_2_Hyperparameter_Tuning Step_3_Threshold_Tuning Step_4_Final_Test_Evaluation; do
     $NB nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Fine_Tuning/fine_tuning/$step.ipynb
 done
 $NB nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Evaluation.ipynb
 ```
+
+The named run writes under `Fine_Tuning/fine_tuning/reproductions/reproduction_01/`, including its own evaluation outputs and prediction CSV. Choose a different name for a new complete rerun. A Step 2 search can resume its existing checkpoints only when the upstream bundle and manifest are unchanged; do not rerun Step 1 first when resuming. To return to the committed reference artifacts, unset `BT4012_TUNING_RUN` and restart the notebook kernels. In PowerShell, set it with `$env:BT4012_TUNING_RUN="reproduction_01"`. In Colab, set `os.environ["BT4012_REPO_DIR"]` to the extracted repository root and `os.environ["BT4012_TUNING_RUN"]` before the setup cells.
 
 On a Mac laptop, put `caffeinate -i` in front of a command so the machine does not go to sleep while a notebook is running.
 
@@ -107,14 +111,14 @@ write_result(PATHS['val'], 'val_result.csv')          # another engineered CSV
 write_result(PATHS['test'], 'result.csv', threshold=0.5)
 ```
 
-The model, encoder, feature order and threshold are read from `Fine_Tuning/fine_tuning/step_4_outputs/final_model_bundle.joblib`, and the input is read in chunks, so large files work too. 
+By default, the model, encoder, feature order and threshold are read from `Fine_Tuning/fine_tuning/step_4_outputs/final_model_bundle.joblib`. When `BT4012_TUNING_RUN` is set, Evaluation reads that named reproduction instead and writes predictions inside its evaluation output directory. The input must contain the engineered features expected by the bundle.
 
 
 ## Folder Directory
 
 ```plaintext
 bt4012-grp3/
-├── data/
+├── data/                      # Optional local data directory; root CSVs also supported
 │   ├── train_transaction.csv   # Transaction features
 │   ├── train_identity.csv      # Identity metadata
 │   ├── train.csv               # Train split (440,018 samples)
@@ -127,7 +131,6 @@ bt4012-grp3/
 ├── result.csv                      # predictions for test.csv written by Evaluation.ipynb (TransactionID, fraud_score, is_fraud_pred, isFraud)
 ├── saved_models/                   # trained model artifacts
 ├── .gitignore                      # Git ignore file for data files and heavy artifacts
-├── .venv                           # virtual environment
 ├── requirements.txt                # Python environment dependencies
 ├── Fine_Tuning/fine_tuning
 │   ├── Step_1_Baseline.ipynb
@@ -139,7 +142,6 @@ bt4012-grp3/
 │   ├── step_3_outputs/                      # Threshold selection results
 │   ├── step_4_outputs/                      # Final model, metrics and plots
 │   ├── requirements-tuning.txt
-│   ├── .gitignore
 │   └── README.md                            # Detailed tuning documentation
 └── README.md                       # Project documentation and summary
 ```
