@@ -14,8 +14,9 @@
 /test.csv
 /split_assignments.csv
 
-# Symlinks to the root CSVs used by the Fine_Tuning notebooks
+# Symlinks to the root CSVs and named reproduction folders used by the Fine_Tuning notebooks
 /Fine_Tuning/fine_tuning/data/
+/Fine_Tuning/fine_tuning/reproductions/
 
 # Row-level prediction exports and scratch
 /Fine_Tuning/fine_tuning/step_*_outputs/*_predictions.csv
@@ -23,3 +24,5 @@
 /evaluation_outputs/*_predictions.csv
 .DS_Store
 .ipynb_checkpoints/
+__pycache__/
+*.py[cod]

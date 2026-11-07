@@ -43,11 +43,7 @@ Step 1 refits the untuned XGBoost with random undersampling selected in
 categorical encoder and feature order for subsequent steps; it is not
 a separate model-selection experiment.
 
-The current modelling output and Step 1 agree at the displayed precision:
-validation AP **0.705831**, with **1,277 true positives** and **448 false
-positives**. The comparison against AP **0.701045** refers to an older
-historical result, so its mismatch flags do not indicate a failure to
-reproduce the current baseline.
+`Modelling.ipynb` runs in `.venv` (`requirements.txt`, `pandas==3.0.6`, where `.astype(str)` keeps missing categories as `NaN`) and achieves validation AP **0.701045** (**1,267 true positives**, **418 false positives**). Step 1 runs in `.venv-tuning` (`Fine_Tuning/fine_tuning/requirements-tuning.txt`, `pandas==2.2.3`, where `.astype(str)` turns missing categories into `"nan"`) and achieves validation AP **0.705831** (**1,277 true positives**, **448 false positives**), so the mismatch flags in `baseline_comparison.csv` reflect that `pandas` version difference rather than a change in model settings.
 
 ### Test Results
 
@@ -103,6 +99,7 @@ Key takeaways:
 - **The F1-best threshold is unstable.** It lands anywhere between **0.39 and 0.58** depending on the fold, and on the test split the chosen threshold changes F1 by only −0.0006 compared with 0.5. The operating threshold should come from review capacity or the cost of a missed fraud versus a false alarm, not from one month's F1 peak.
 
 Notes:
+- `Modelling.ipynb` uses `requirements.txt` (`pandas==3.0.6`, validation AP **0.7010**), while Fine_Tuning and `Evaluation.ipynb` use `Fine_Tuning/fine_tuning/requirements-tuning.txt` (`pandas==2.2.3`, validation AP **0.7058**). The lower CV (**0.654**) and test (**0.594**) baseline numbers reflect scoring across multiple time windows and the harder May test month rather than the single April validation month.
 - The notebook reads the tuned hyperparameters and threshold from the Fine_Tuning output folders. Those folders now hold a full re-run made on 2026-10-23 (candidate 15 again; F1-best validation threshold **0.4594** instead of 0.3574). The original run is archived unchanged in `Fine_Tuning/fine_tuning/recorded_run/`, and `Fine_Tuning/fine_tuning/README.md` compares the two.
 - All tables and plots are saved in `evaluation_outputs/`. The settings (`N_FOLDS`, `GAP_DAYS`, `N_BOOTSTRAP`, …) are constants at the top of the notebook, and the whole notebook runs in about 2 minutes.
 
@@ -110,39 +107,42 @@ Notes:
 
 **Step 1 – Get the data.** Download `train_transaction.csv` and `train_identity.csv` from the [Kaggle competition page](https://www.kaggle.com/competitions/ieee-fraud-detection/data) and put them in the repository root. Raw datasets and engineered splits are git-ignored. Aggregate result CSVs and the committed prediction export are retained.
 
-**Step 2 – Create the Python environment.** The Fine_Tuning notebooks were recorded with pinned package versions, so the whole pipeline runs in one environment built from those pins (Python 3.13). From the repository root:
+**Step 2 – Create the Python environments.** Two pinned dependency files are kept so both the original baseline (`0.7010` validation AP) and the Fine_Tuning / Evaluation runs (`0.7058` validation AP) reproduce cleanly (Python 3.12 or 3.13). From the repository root:
 
 ```bash
-python3.13 -m venv .venv-tuning
-.venv-tuning/bin/python -m pip install numpy==2.1.3 pandas==2.2.3 scikit-learn==1.6.1 imbalanced-learn==0.14.2 \
-    xgboost==3.4.1 joblib==1.6.0 matplotlib==3.11.2 seaborn==0.13.2 lightgbm==4.7.0 ipykernel nbconvert
+# Baseline & feature engineering environment (pandas 3.0.6, scikit-learn 1.9.1)
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt nbconvert
+
+# Fine-tuning & evaluation environment (pandas 2.2.3, scikit-learn 1.6.1)
+python3 -m venv .venv-tuning
+.venv-tuning/bin/python -m pip install -r Fine_Tuning/fine_tuning/requirements-tuning.txt
 ```
 
-The core pins are the ones listed in `Fine_Tuning/fine_tuning/requirements-tuning.txt`. On macOS, LightGBM and XGBoost also need the OpenMP runtime: `brew install libomp`.
+On macOS, LightGBM and XGBoost also need the OpenMP runtime: `brew install libomp`.
 
 **Step 3 – Choose saved-result review or a fresh reproduction.** Saved notebook outputs and artifacts can be reviewed without running training. For a new run, use a unique output name as explained below; do not execute Step 1 over an existing downstream run.
 
-| Order | Notebook | Needs | Writes | Time (Apple M4 Pro) |
-| --- | --- | --- | --- | --- |
-| 1 | `Data_Transformation_Feature_Engineering.ipynb` | the two raw Kaggle files | `train.csv`, `val.csv`, `test.csv`, `split_assignments.csv`, `split_summary.csv` | ~4 min |
-| 2 | `Modelling.ipynb` | the three split CSVs | comparison tables inside the notebook | ~2 min |
-| 3 | `Fine_Tuning/fine_tuning/Step_1_Baseline.ipynb`, then `Step_2_Hyperparameter_Tuning.ipynb`, `Step_3_Threshold_Tuning.ipynb`, `Step_4_Final_Test_Evaluation.ipynb` | the three split CSVs in the repository root or root `data/` (no symlinks required) | `baseline_outputs/`, `step_2_outputs/`, `step_3_outputs/`, `step_4_outputs/` | ~5 min |
-| 4 | `Evaluation.ipynb` | the three split CSVs and the Fine_Tuning output folders | `evaluation_outputs/` | ~2 min |
+| Order | Notebook | Environment | Needs | Writes | Time (Apple M4 Pro) |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `Data_Transformation_Feature_Engineering.ipynb` | `.venv` | the two raw Kaggle files | `train.csv`, `val.csv`, `test.csv`, `split_assignments.csv`, `split_summary.csv` | ~4 min |
+| 2 | `Modelling.ipynb` | `.venv` | the three split CSVs | comparison tables inside the notebook (`0.7010` validation AP) | ~2 min |
+| 3 | `Fine_Tuning/fine_tuning/Step_1_Baseline.ipynb`, then `Step_2_Hyperparameter_Tuning.ipynb`, `Step_3_Threshold_Tuning.ipynb`, `Step_4_Final_Test_Evaluation.ipynb` | `.venv-tuning` | the three split CSVs in the repository root or root `data/` (no symlinks required) | `baseline_outputs/`, `step_2_outputs/`, `step_3_outputs/`, `step_4_outputs/` | ~5 min |
+| 4 | `Evaluation.ipynb` | `.venv-tuning` | the three split CSVs and the Fine_Tuning output folders | `evaluation_outputs/`, `result.csv` | ~2 min |
 
-*To run a notebook interactively:* open it in VS Code, Antigravity or JupyterLab, pick the `.venv-tuning` interpreter as the kernel, and choose *Run All*. Run feature engineering and initial modelling from the repository root. Tuning and Evaluation resolve the repository automatically from the working directory or its parents. The three engineered CSVs can be in the repository root or root `data/`; root files take precedence. No local symlinks are required.
+*To run a notebook interactively:* open it in VS Code, Antigravity or JupyterLab, select `.venv` (for notebooks 1–2) or `.venv-tuning` (for notebooks 3–4) as the kernel, and choose *Run All*. Run feature engineering and initial modelling from the repository root. Tuning and Evaluation resolve the repository automatically from the working directory or its parents. The three engineered CSVs can be in the repository root or root `data/`; root files take precedence. No local symlinks are required.
 
 *To run everything from the terminal* (each command executes one notebook in place and saves its outputs; run from the repository root):
 
 ```bash
-NB=.venv-tuning/bin/jupyter
-$NB nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Data_Transformation_Feature_Engineering.ipynb
-$NB nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Modelling.ipynb
+.venv/bin/jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Data_Transformation_Feature_Engineering.ipynb
+.venv/bin/jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Modelling.ipynb
 # Set a NEW name for each complete reproduction; keep it set through Evaluation.
 export BT4012_TUNING_RUN=reproduction_01
 for step in Step_1_Baseline Step_2_Hyperparameter_Tuning Step_3_Threshold_Tuning Step_4_Final_Test_Evaluation; do
-    $NB nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Fine_Tuning/fine_tuning/$step.ipynb
+    .venv-tuning/bin/jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Fine_Tuning/fine_tuning/$step.ipynb
 done
-$NB nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Evaluation.ipynb
+.venv-tuning/bin/jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 Evaluation.ipynb
 ```
 
 The named run writes under `Fine_Tuning/fine_tuning/reproductions/reproduction_01/`, including its own evaluation outputs and prediction CSV. Choose a different name for a new complete rerun. A Step 2 search can resume its existing checkpoints only when the upstream bundle and manifest are unchanged; do not rerun Step 1 first when resuming. To return to the committed reference artifacts, unset `BT4012_TUNING_RUN` and restart the notebook kernels. In PowerShell, set it with `$env:BT4012_TUNING_RUN="reproduction_01"`. In Colab, set `os.environ["BT4012_REPO_DIR"]` to the extracted repository root and `os.environ["BT4012_TUNING_RUN"]` before the setup cells.
@@ -176,7 +176,9 @@ bt4012-grp3/
 ├── result.csv                      # predictions for test.csv written by Evaluation.ipynb (TransactionID, fraud_score, is_fraud_pred, isFraud)
 ├── saved_models/                   # trained model artifacts
 ├── .gitignore                      # Git ignore file for data files and heavy artifacts
-├── requirements.txt                # Python environment dependencies
+├── .venv                           # Baseline & feature-engineering virtual environment
+├── .venv-tuning                    # Fine-tuning & evaluation virtual environment
+├── requirements.txt                # Baseline Python dependencies (pandas 3.0.6, scikit-learn 1.9.1)
 ├── Fine_Tuning/fine_tuning
 │   ├── Step_1_Baseline.ipynb
 │   ├── Step_2_Hyperparameter_Tuning.ipynb
@@ -186,7 +188,7 @@ bt4012-grp3/
 │   ├── step_2_outputs/                      # Hyperparameter search results
 │   ├── step_3_outputs/                      # Threshold selection results
 │   ├── step_4_outputs/                      # Final model, metrics and plots
-│   ├── requirements-tuning.txt
+│   ├── requirements-tuning.txt              # Fine-tuning & evaluation dependencies (pandas 2.2.3, scikit-learn 1.6.1)
 │   └── README.md                            # Detailed tuning documentation
 └── README.md                       # Project documentation and summary
 ```
